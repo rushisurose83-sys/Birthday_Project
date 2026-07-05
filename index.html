@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>RushiEats — Happy Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-base:#0b0a12;
+    --bg-elevated:#151220;
+    --bg-card:rgba(255,255,255,0.045);
+    --border-soft:rgba(255,255,255,0.08);
+    --accent-violet:#a78bfa;
+    --accent-violet-dim:#7c6ae0;
+    --accent-orange:#ff7a59;
+    --accent-gold:#e8c468;
+    --text-primary:#f5f3ff;
+    --text-muted:#9c93b5;
+    --text-faint:#655d7a;
+    --shadow-deep: 0 20px 50px -20px rgba(0,0,0,0.65);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-base);
+    color:var(--text-primary);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  ::selection{background:var(--accent-violet); color:#0b0a12;}
+
+  /* ---------- background ambience ---------- */
+  .ambient{
+    position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+  }
+  .blob{
+    position:absolute; border-radius:50%;
+    filter:blur(70px); opacity:0.35;
+    animation: drift 16s ease-in-out infinite;
+  }
+  .blob-1{ width:340px; height:340px; background:var(--accent-violet); top:-100px; left:-80px; animation-delay:0s;}
+  .blob-2{ width:280px; height:280px; background:var(--accent-orange); bottom:-80px; right:-60px; animation-delay:3s;}
+  .blob-3{ width:220px; height:220px; background:var(--accent-gold); top:40%; left:60%; opacity:0.18; animation-delay:6s;}
+
+  @keyframes drift{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(30px,-20px) scale(1.08); }
+  }
+
+  /* ---------- SCREEN 1 : INTRO ---------- */
+  #screen-intro{
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:32px 24px;
+    text-align:center;
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  #screen-intro.fade-out{
+    opacity:0;
+    transform:scale(0.97);
+    pointer-events:none;
+  }
+
+  .intro-eyebrow{
+    font-size:12px;
+    letter-spacing:0.28em;
+    text-transform:uppercase;
+    color:var(--accent-gold);
+    margin-bottom:22px;
+    opacity:0.85;
+    font-weight:600;
+  }
+
+  .typewriter-wrap{
+    max-width:560px;
+    min-height:190px;
+    display:flex;
+    align-items:center;
+  }
+
+  #typewriter-text{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.4rem, 5.6vw, 2.3rem);
+    line-height:1.35;
+    color:var(--text-primary);
+  }
+
+  .cursor{
+    display:inline-block;
+    width:3px;
+    background:var(--accent-violet);
+    margin-left:2px;
+    animation:blink 0.85s step-start infinite;
+    vertical-align:-0.15em;
+    height:1em;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  #enter-btn{
+    margin-top:40px;
+    opacity:0;
+    transform:translateY(14px);
+    pointer-events:none;
+    transition:opacity 0.6s ease, transform 0.6s ease;
+
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.02em;
+    color:#0b0a12;
+    background:linear-gradient(135deg, var(--accent-violet), var(--accent-orange));
+    border:none;
+    padding:16px 38px;
+    border-radius:100px;
+    cursor:pointer;
+    box-shadow:0 0 0 rgba(167,139,250,0);
+  }
+  #enter-btn.visible{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+    animation: glow-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes glow-pulse{
+    0%,100%{ box-shadow:0 0 18px 0 rgba(167,139,250,0.45), 0 0 40px -10px rgba(255,122,89,0.35); }
+    50%{ box-shadow:0 0 30px 4px rgba(167,139,250,0.65), 0 0 60px -5px rgba(255,122,89,0.5); }
+  }
+  #enter-btn:active{ transform:scale(0.96); }
+
+  /* ---------- SCREEN 2 : APP ---------- */
+  #screen-app{
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:none;
+    opacity:0;
+    transform:translateY(40px);
+    transition:opacity 0.6s ease, transform 0.6s ease;
+  }
+  #screen-app.active{
+    display:block;
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  header.topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px;
+    background:rgba(11,10,18,0.72);
+    backdrop-filter:blur(16px) saturate(140%);
+    -webkit-backdrop-filter:blur(16px) saturate(140%);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .logo{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:22px;
+    letter-spacing:0.01em;
+    background:linear-gradient(120deg, var(--accent-violet), var(--accent-orange));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .logo-tag{
+    font-size:10px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    display:block;
+    margin-top:2px;
+  }
+  .delivery-pill{
+    font-size:11px;
+    color:var(--text-muted);
+    background:var(--bg-elevated);
+    border:1px solid var(--border-soft);
+    padding:7px 12px;
+    border-radius:100px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .dot-live{
+    width:6px; height:6px; border-radius:50%;
+    background:#5be07a;
+    box-shadow:0 0 8px #5be07a;
+  }
+
+  .hero-strip{
+    padding:22px 20px 6px;
+  }
+  .hero-strip h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:1.5rem;
+    margin:0 0 6px;
+  }
+  .hero-strip p{
+    margin:0;
+    color:var(--text-muted);
+    font-size:13.5px;
+    line-height:1.5;
+  }
+
+  main.menu{
+    padding:18px 16px 60px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    max-width:560px;
+    margin:0 auto;
+  }
+
+  .item-card{
+    position:relative;
+    background:var(--bg-card);
+    border:1px solid var(--border-soft);
+    border-radius:22px;
+    padding:20px;
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    box-shadow:var(--shadow-deep);
+    opacity:0;
+    transform:translateY(24px);
+    animation:card-in 0.6s ease forwards;
+  }
+  .item-card.gold{
+    border-color:rgba(232,196,104,0.35);
+    background:linear-gradient(160deg, rgba(232,196,104,0.06), rgba(255,255,255,0.03));
+  }
+  @keyframes card-in{
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .card-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .item-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1.08rem;
+    margin:0 0 4px;
+  }
+  .price-badge{
+    flex-shrink:0;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.04em;
+    color:var(--bg-base);
+    background:linear-gradient(120deg,#5be07a,#3fc98a);
+    padding:6px 10px;
+    border-radius:8px;
+    transform:rotate(3deg);
+    box-shadow:0 4px 10px -3px rgba(91,224,122,0.5);
+  }
+  .item-card.gold .price-badge{
+    background:linear-gradient(120deg, var(--accent-gold), #f2d98a);
+    box-shadow:0 4px 10px -3px rgba(232,196,104,0.5);
+  }
+
+  .reason-tag{
+    margin-top:12px;
+    font-size:12.5px;
+    color:var(--accent-gold);
+    background:rgba(232,196,104,0.08);
+    border:1px dashed rgba(232,196,104,0.35);
+    border-radius:12px;
+    padding:9px 12px;
+    line-height:1.45;
+  }
+  .reason-tag b{
+    display:block;
+    font-size:10px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent-orange);
+    margin-bottom:3px;
+  }
+
+  .item-desc{
+    margin-top:12px;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--text-muted);
+  }
+
+  .order-btn{
+    margin-top:16px;
+    width:100%;
+    border:none;
+    padding:13px;
+    border-radius:14px;
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    letter-spacing:0.01em;
+    color:#0b0a12;
+    background:linear-gradient(120deg, var(--accent-violet), var(--accent-orange));
+    cursor:pointer;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .order-btn:active{
+    transform:scale(0.97);
+  }
+  .order-btn:hover{
+    box-shadow:0 10px 24px -8px rgba(167,139,250,0.5);
+  }
+
+  footer.app-footer{
+    text-align:center;
+    color:var(--text-faint);
+    font-size:11.5px;
+    padding:10px 20px 40px;
+    letter-spacing:0.02em;
+  }
+  footer.app-footer span{ color:var(--accent-orange); }
+
+  @media (min-width:640px){
+    .typewriter-wrap{ min-height:150px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<!-- SCREEN 1 — INTRO -->
+<section id="screen-intro">
+  <div class="intro-eyebrow">A very unofficial delivery app</div>
+  <div class="typewriter-wrap">
+    <p id="typewriter-text"><span class="cursor"></span></p>
+  </div>
+  <button id="enter-btn">Enter RushiEats</button>
+</section>
+
+<!-- SCREEN 2 — APP -->
+<section id="screen-app">
+  <header class="topbar">
+    <div>
+      <div class="logo">RushiEats</div>
+      <span class="logo-tag">Delivering feelings, not just food</span>
+    </div>
+    <div class="delivery-pill"><span class="dot-live"></span> Open only for you</div>
+  </header>
+
+  <div class="hero-strip">
+    <h1>Happy 19th, legend 🎂</h1>
+    <p>Handpicked campus favorites, curated (and paid for, emotionally) by me. Menu of exactly four items, each non-refundable and slightly embarrassing.</p>
+  </div>
+
+  <main class="menu">
+
+    <article class="item-card" style="animation-delay:0.05s">
+      <div class="card-top">
+        <div>
+          <h2 class="item-title">Campus Wala Pattice</h2>
+        </div>
+        <span class="price-badge">₹0.00</span>
+      </div>
+      <div class="reason-tag">
+        <b>Why it's on the menu</b>
+        Because surviving marathon coding sessions and endless lab submissions requires some serious, unapologetic carb-loading.
+      </div>
+      <p class="item-desc">Hot, crispy, and always comforting. Hanging out with you gives me that exact same warm, stress-free vibe. Guaranteed to make your day at least 100x better.</p>
+      <button class="order-btn" onclick="orderNow()">Order Now</button>
+    </article>
+
+    <article class="item-card" style="animation-delay:0.15s">
+      <div class="card-top">
+        <div>
+          <h2 class="item-title">Drama-Free Dahipuri</h2>
+        </div>
+        <span class="price-badge">₹0.00</span>
+      </div>
+      <div class="reason-tag">
+        <b>Why it's on the menu</b>
+        To perfectly match your sweet, spicy, and completely unpredictable mood swings during exam season.
+      </div>
+      <p class="item-desc">A little tangy, a little sweet, and absolutely addictive. Honestly, keeping up with you is just like eating this — a beautiful mess, but I wouldn't trade it for anything.</p>
+      <button class="order-btn" onclick="orderNow()">Order Now</button>
+    </article>
+
+    <article class="item-card" style="animation-delay:0.25s">
+      <div class="card-top">
+        <div>
+          <h2 class="item-title">Midday Cravings Momos</h2>
+        </div>
+        <span class="price-badge">₹0.00</span>
+      </div>
+      <div class="reason-tag">
+        <b>Why it's on the menu</b>
+        Because the only thing spicier than the red momo chutney is our top-secret campus gossip.
+      </div>
+      <p class="item-desc">Steamed to perfection, just like my brain after a lecture. I would happily share my very last momo with you... and you know that is the highest compliment I can give.</p>
+      <button class="order-btn" onclick="orderNow()">Order Now</button>
+    </article>
+
+    <article class="item-card gold" style="animation-delay:0.35s">
+      <div class="card-top">
+        <div>
+          <h2 class="item-title">The "What Zumka?" Surprise</h2>
+        </div>
+        <span class="price-badge">₹0.00</span>
+      </div>
+      <div class="reason-tag">
+        <b>Why it's on the menu</b>
+        Because you already act like the main character of a Bollywood movie, so you might as well have the accessories to match.
+      </div>
+      <p class="item-desc">I know this isn't a snack, but it's the perfect side dish to that beautiful smile of yours. Tap "Order Now" to claim the actual physical gift I got you (and yes, you have to wear them when we go out for Dahipuri).</p>
+      <button class="order-btn" onclick="orderNow()">Order Now</button>
+    </article>
+
+  </main>
+
+  <footer class="app-footer">Made with zero budget and <span>100% chatpata</span> intentions.</footer>
+</section>
+
+<script>
+  const fullText = "Happy 19th Birthday! I couldn't afford to buy you a cafe, so I built you a delivery app instead.";
+  const textEl = document.getElementById('typewriter-text');
+  const enterBtn = document.getElementById('enter-btn');
+  const cursor = document.querySelector('.cursor');
+
+  let i = 0;
+  const typeSpeed = 38;
+
+  function typeWriter(){
+    if(i < fullText.length){
+      textEl.insertBefore(document.createTextNode(fullText.charAt(i)), cursor);
+      i++;
+      setTimeout(typeWriter, typeSpeed);
+    } else {
+      enterBtn.classList.add('visible');
+    }
+  }
+
+  window.addEventListener('load', () => {
+    setTimeout(typeWriter, 400);
+  });
+
+  const screenIntro = document.getElementById('screen-intro');
+  const screenApp = document.getElementById('screen-app');
+
+  enterBtn.addEventListener('click', () => {
+    screenIntro.classList.add('fade-out');
+    setTimeout(() => {
+      screenIntro.style.display = 'none';
+      screenApp.classList.add('active');
+    }, 650);
+  });
+
+  function orderNow(){
+    alert("Connecting to WhatsApp...");
+  }
+</script>
+
+</body>
+</html>
